@@ -4,6 +4,8 @@ import random
 GUESSES = 12
 COLS = 4
 COLORS = {0: (255, 255, 255), 1: (255, 0, 0), 2: (0, 255, 0), 3: (204, 0, 255), 4: (0, 102, 204), 5: (255, 153, 0)}
+pygame.font.init()
+FONT = pygame.font.SysFont('Comic Sans MS', 20)
 
 class Game:
     def __init__(self, width, height):
@@ -37,15 +39,20 @@ class Game:
             # Draw status
             # Red
         for pos in self.redPos:
-            position = pos#(self.marginX+self.size*COLS,self.size*(self.currentRow+1)+self.marginY,self.red*self.size/COLS,self.size/COLS)
+            position = pos[0]#(self.marginX+self.size*COLS,self.size*(self.currentRow+1)+self.marginY,self.red*self.size/COLS,self.size/COLS)
             pygame.draw.rect(win, (255, 0, 0), position)
             pygame.draw.rect(win, (0,0,0), position, 1)  # (size*i,size*j, size, size)
+            redText = FONT.render(str(pos[1]), False, (0, 0, 0))
+            win.blit(redText, (pos[0][0]+6, pos[0][1]-2))
 
             # White
         for pos in self.whitePos:
-            position = pos#(self.marginX+self.size*COLS+self.red*(self.size/COLS), self.size*(self.currentRow+1)+self.marginY, self.white * self.size / COLS, self.size / COLS)
-            pygame.draw.rect(win, (0, 255, 0), position)
+            position = pos[0]#(self.marginX+self.size*COLS+self.red*(self.size/COLS), self.size*(self.currentRow+1)+self.marginY, self.white * self.size / COLS, self.size / COLS)
+            pygame.draw.rect(win, (255, 255, 255), position)
             pygame.draw.rect(win, (0, 0, 0), position, 1)  # (size*i,size*j, size, size)
+            whiteText = FONT.render(str(pos[1]), False, (0, 0, 0))
+            win.blit(whiteText, (pos[0][0]+6, pos[0][1]-2))
+
 
         if self.won or self.currentRow == -1:
             for i in range(COLS):
@@ -82,6 +89,7 @@ class Game:
         rand = random.Random()
 
         self.correct = [rand.randint(1, len(COLORS)-1) for _ in range(COLS)]
+        print(self.correct)
     def check_guess(self):
         red = 0 # Color in correct index
         white = 0 # Color in answer
@@ -98,8 +106,19 @@ class Game:
         self.currentRow -= 1
         self.red, self.white = red, white
 
-        self.redPos.append((self.marginX+self.size*COLS,self.size*(self.currentRow+1)+self.marginY,self.red*self.size/COLS,self.size/COLS))
-        self.whitePos.append((self.marginX+self.size*COLS+self.red*(self.size/COLS), self.size*(self.currentRow+1)+self.marginY, self.white * self.size / COLS, self.size / COLS))
+        #self.redPos.append((self.marginX+self.size*COLS,self.size*(self.currentRow+1)+self.marginY,self.red*self.size/COLS,self.size/COLS))
+        #self.whitePos.append((self.marginX+self.size*COLS+self.red*(self.size/COLS), self.size*(self.currentRow+1)+self.marginY, self.white * self.size / COLS, self.size / COLS))
+        print(f'red: {self.red}, white: {self.white}')
+
+        if self.red > 0:
+            redPos = (self.marginX+self.size*COLS,self.size*(self.currentRow+1)+self.marginY, self.size/2, self.size/2)
+            self.redPos.append((redPos, red))
+
+        if self.white > 0:
+            whitePos = (self.marginX+self.size*COLS,self.size*(self.currentRow+1)+self.marginY+(self.size/2), self.size/2, self.size/2)
+            self.whitePos.append((whitePos, white))
+
+
         if self.red == 4:
             self.won = True
 
